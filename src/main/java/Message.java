@@ -1,15 +1,20 @@
-import com.google.gson.Gson;
-
 public class Message {
-    String nameID, func;
+    String componentName, func, spaceName;
 
-    public Message(String nameID, String func) {
-        this.nameID = nameID;
+    public Message(String spaceName, String func) {
+        this.spaceName = spaceName;
         this.func = func;
     }
 
     public Message(String func) {
         this.func = func;
+    }
+
+    public Message(String componentName, String func, String spaceName) {
+        this.componentName = componentName;
+        this.func = func;
+        this.spaceName = spaceName;
+
     }
 
 }

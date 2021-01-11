@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 public class Server {
     //Connection
@@ -30,6 +29,7 @@ public class Server {
         Gson gson = new Gson();
         String jsonString;
         Message msg;
+        Object[] theRoom;
 
         while (true) {
             String roomUrl;
@@ -42,20 +42,35 @@ public class Server {
                     retrieveListAndResponse();
                     break;
                 case "add":
-                    System.out.println("Message was: " + msg.nameID + " " + msg.func);
-                    Object[] s = lobbySpace.queryp(new ActualField(msg.nameID), new FormalField(String.class));
+                    System.out.println("Message was: " + msg.spaceName + " " + msg.func);
+                    Object[] s = lobbySpace.queryp(new ActualField(msg.spaceName), new FormalField(String.class));
                     if (s != null) {
                         lobbySpace.put("add", "Room with that name already exist");
                     } else {
-                        roomUrl = "tcp://127.0.0.1:9001/" + msg.nameID + "?keep";
+                        roomUrl = "tcp://127.0.0.1:9001/" + msg.spaceName + "?keep";
                         System.out.println("Creating new room in another thread");
-                        rooms.put(msg.nameID);
-                        new Thread(new RoomHandler(msg.nameID, lobby)).start();
+                        rooms.put(msg.spaceName);
+                        new Thread(new RoomHandler(msg.spaceName, lobby)).start();
 
-                        System.out.println("Created new room with the name: " + msg.nameID + " Room size is now: " + rooms.size());
+                        System.out.println("Created new room with the name: " + msg.spaceName + " Room size is now: " + rooms.size());
                     }
                     break;
-                case "del":
+                case "addComp":
+                case "deleteComp":
+                case "showAll":
+                    theRoom = rooms.queryp(new ActualField(msg.spaceName));
+                    if (theRoom != null){
+                        String roomURI = "tcp://127.0.0.1:9001/" + msg.spaceName + "?keep";
+                        try {
+                            RemoteSpace space = new RemoteSpace(roomURI);
+                            new Thread(new ComponentHandler(msg.componentName,"off",space, msg.func)).start();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }else{
+                        System.out.println("No room by that name");
+                    }
+                    break;
 
             }
         }

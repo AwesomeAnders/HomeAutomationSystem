@@ -19,12 +19,16 @@ public class Client {
         boolean running = true;
         Scanner scan = new Scanner(System.in);
         Gson gson = new Gson();
+        String spaceName;
+        String componentName;
+        String jsonMsg;
 
         while (running) {
             System.out.println("Press 1 to see all rooms");
             System.out.println("Press 2 to add a new room");
-            System.out.println("Press 3 to join a room");
-            System.out.println("Press 4 to quit");
+            System.out.println("Press 3 to add a new component");
+            System.out.println("Press 4 to delete a component");
+            System.out.println("Press 5 to quit");
 
             String scanned = scan.next();
             Message msg;
@@ -51,9 +55,29 @@ public class Client {
                     break;
                 case 2:
                     System.out.println("Please enter new room name");
-                    String name = scan.next();
-                    msg = new Message(name, "add");
+                    spaceName = scan.next();
+                    msg = new Message(spaceName, "add");
                     remoteSpace.put(gson.toJson(msg));
+                    break;
+
+                case 3:
+                    System.out.println("Enter name of space");
+                    spaceName = scan.next();
+                    System.out.println("Enter name of component");
+                    componentName = scan.next();
+                    Message addCompMsg = new Message(componentName, "addComp", spaceName);
+                    jsonMsg = gson.toJson(addCompMsg);
+                    remoteSpace.put(jsonMsg);
+                    break;
+
+                case 4:
+                    System.out.println("Enter name of space");
+                    spaceName = scan.next();
+                    System.out.println("Enter name of component");
+                    componentName = scan.next();
+                    Message deleteCompMsg = new Message(componentName, "deleteComp", spaceName);
+                    jsonMsg = gson.toJson(deleteCompMsg);
+                    remoteSpace.put(jsonMsg);
                     break;
             }
         }
