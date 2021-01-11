@@ -7,7 +7,7 @@ public class RoomHandler implements Runnable{
     private Space room;
     private String name;
 
-    public RoomHandler(String name, SpaceRepository lobby) {
+    public RoomHandler(String name, SpaceRepository lobby) throws InterruptedException {
         this.name = name;
 
         room = new SequentialSpace();
