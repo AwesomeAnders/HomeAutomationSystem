@@ -42,21 +42,24 @@ public class ComponentHandler implements Runnable{
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-
-
                 break;
-
             case "showAll":
                 showAll();
                 break;
-
             case "updateComp":
-                updateComponent();
-                break;
+                try {
+                    System.out.println("Grapping key");
+                    key.get(new ActualField("key"));
+                    updateComponent();
 
+                    System.out.println("Returning key");
+                    key.put("key");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                break;
             case "default":
                 break;
-
         }
     }
 
@@ -105,7 +108,7 @@ public class ComponentHandler implements Runnable{
         try {
             Object[] item = space.getp(new ActualField(name), new FormalField(Object.class));
             if (item != null){
-                System.out.println("deleted item "+ (String) item[0].toString());
+                System.out.println("deleted item "+ item[0].toString());
             }else{
                 System.out.println("Something went wrong...");
             }
