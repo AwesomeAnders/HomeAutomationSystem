@@ -1,3 +1,4 @@
+import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.Space;
 import org.jspace.Tuple;
@@ -10,10 +11,6 @@ public class ComponentHandler implements Runnable{
     private String status;
     private Space space;
     private String command;
-
-    public ComponentHandler(Space space){
-        this.space = space;
-    }
 
     public ComponentHandler(String name, String status, Space space, String command) {
         this.name = name;
@@ -40,6 +37,10 @@ public class ComponentHandler implements Runnable{
                 showAll();
                 break;
 
+            case "updateComp":
+                updateComponent();
+                break;
+
             case "default":
                 break;
 
@@ -57,10 +58,26 @@ public class ComponentHandler implements Runnable{
         }
     }
 
+    public void updateComponent(){
+        try {
+           Object[] item = space.getp(new ActualField(name), new FormalField(Object.class));
+
+           if (item != null){
+
+               Tuple tuple = (Tuple) item[1];
+               boolean componentStatus =  Boolean.parseBoolean(tuple.getElementAt(1).toString());
+               componentStatus = !componentStatus;
+               space.put(name, new Tuple(name, componentStatus));
+           }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void addComponent(){
         Tuple component = new Tuple(name, status);
         try {
-            if ( space.put(component)){
+            if ( space.put(name, component)){
                 System.out.println("added new component: "+ component.toString());
             }else{
                 System.out.println("Something went wrong...");
@@ -73,7 +90,7 @@ public class ComponentHandler implements Runnable{
 
     public void deleteComponent(){
         try {
-            Object[] item = space.getp(new FormalField(Object.class));
+            Object[] item = space.getp(new ActualField(name), new FormalField(Object.class));
             if (item != null){
                 System.out.println("deleted item "+ (String) item[0].toString());
             }else{

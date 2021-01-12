@@ -57,6 +57,7 @@ public class Server {
                     break;
                 case "addComp":
                 case "deleteComp":
+                case "updateComp":
                 case "showAll":
                     theRoom = rooms.queryp(new ActualField(msg.spaceName));
                     if (theRoom != null){

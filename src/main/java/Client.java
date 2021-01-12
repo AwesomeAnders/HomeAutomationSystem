@@ -28,7 +28,8 @@ public class Client {
             System.out.println("Press 2 to add a new room");
             System.out.println("Press 3 to add a new component");
             System.out.println("Press 4 to delete a component");
-            System.out.println("Press 5 to quit");
+            System.out.println("Press 5 to update a component");
+            System.out.println("Press 6 to quit");
 
             String scanned = scan.next();
             Message msg;
@@ -77,6 +78,16 @@ public class Client {
                     componentName = scan.next();
                     Message deleteCompMsg = new Message(componentName, "deleteComp", spaceName);
                     jsonMsg = gson.toJson(deleteCompMsg);
+                    remoteSpace.put(jsonMsg);
+                    break;
+
+                case 5:
+                    System.out.println("Enter name of space");
+                    spaceName = scan.next();
+                    System.out.println("Enter name of component");
+                    componentName = scan.next();
+                    Message updateCompMsg = new Message(componentName, "updateComp", spaceName);
+                    jsonMsg = gson.toJson(updateCompMsg);
                     remoteSpace.put(jsonMsg);
                     break;
             }
