@@ -1,13 +1,11 @@
-import org.jspace.FormalField;
-import org.jspace.Space;
-import org.jspace.Tuple;
+import org.jspace.*;
 
 import java.util.List;
 
 public class ComponentHandler implements Runnable{
-
     private String name;
     private String status;
+    private Space key;
     private Space space;
     private String command;
 
@@ -25,15 +23,31 @@ public class ComponentHandler implements Runnable{
 
     @Override
     public void run() {
+        key = new SequentialSpace(1);
+        try {
+            key.put("key");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         switch (command){
 
             case "addComp":
                 addComponent();
                 break;
-
             case "deleteComp":
-                deleteComponent();
+                try {
+                    System.out.println("Grapping key");
+                    key.get(new ActualField("key"));
+                    deleteComponent();
+
+                    System.out.println("Returning key");
+                    key.put("key");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+
                 break;
 
             case "showAll":
