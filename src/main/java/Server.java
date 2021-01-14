@@ -32,29 +32,24 @@ public class Server {
         Object[] theRoom;
 
         while (true) {
-            String roomUrl;
+
             jsonString = lobbySpace.get(new FormalField(Object.class))[0].toString();
             msg = gson.fromJson(jsonString, Message.class);
 
             switch (msg.func) {
                 case "list":
-                    System.out.println("Message was: " + msg.func);
-                    retrieveListAndResponse();
+                    new Thread(new RoomHandler(lobby,rooms, msg.func)).start();
                     break;
-                case "add":
-                    System.out.println("Message was: " + msg.spaceName + " " + msg.func);
-                    Object[] s = lobbySpace.queryp(new ActualField(msg.spaceName), new FormalField(String.class));
-                    if (s != null) {
-                        lobbySpace.put("add", "Room with that name already exist");
-                    } else {
-                        roomUrl = "tcp://127.0.0.1:9001/" + msg.spaceName + "?keep";
-                        System.out.println("Creating new room in another thread");
-                        rooms.put(msg.spaceName);
-                        new Thread(new RoomHandler(msg.spaceName, lobby)).start();
 
+                case "add":
+                    Object[] s = lobbySpace.queryp(new ActualField(msg.spaceName), new FormalField(String.class));
+                    if (s == null) {
+                        new Thread(new RoomHandler(msg.spaceName, lobby, rooms, msg.func)).start();
                         System.out.println("Created new room with the name: " + msg.spaceName + " Room size is now: " + rooms.size());
-                    }
+                    } else
+                        System.out.println("Room by that name already exists");
                     break;
+
                 case "addComp":
                 case "deleteComp":
                 case "updateComp":
@@ -73,30 +68,9 @@ public class Server {
                     }
                     break;
 
+                case "default":
+                    break;
             }
         }
-    }
-
-    private static void retrieveListAndResponse() throws InterruptedException {
-        Gson gson = new Gson();
-        List<String> responseList = new ArrayList<>();
-        List<Object[]> list = rooms.queryAll(new FormalField(String.class));
-
-        //Changing the formatting of response from "["stue"] to "stue" so Json can parse it correctly
-        for (int i = 0; i < list.size(); i++) {
-            String str = formatStr(Arrays.toString(list.get(i)));
-            responseList.add(str);
-        }
-
-        //Testing of query
-        /*System.out.println("Result length was: " + list.size());
-        String json = gson.toJson(list);
-        System.out.println(json);*/
-
-        lobbySpace.put("list", gson.toJson(responseList));
-    }
-
-    private static String formatStr(String str) {
-        return str.substring(1,str.length()-1);
     }
 }
