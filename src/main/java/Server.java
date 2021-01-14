@@ -11,6 +11,7 @@ public class Server {
     public final static String LOCAL_HOST = "tcp://127.0.0.1:9001/?keep";
     private static Space lobbySpace;
     private static Space rooms;
+    private static Space clientSpace;
 
     public static void main(String[] argv) throws InterruptedException, IllegalStateException {
         // Space exposed to external client
@@ -20,6 +21,7 @@ public class Server {
         // Rooms available in lobby space
         lobbySpace = new SequentialSpace();
         rooms = new SequentialSpace();
+        clientSpace = new SequentialSpace();
 
         // Adding a space called Room to manage all lobbySpace in spaceRepo
         lobby.add("lobbySpace", lobbySpace);
@@ -72,7 +74,13 @@ public class Server {
                         System.out.println("No room by that name");
                     }
                     break;
-
+                case "showUsers":
+                    new Thread(new UserHandler(msg.func,lobbySpace, clientSpace)).start();
+                    break;
+                case "createUser":
+                case "login":
+                    new Thread(new UserHandler(msg.user,msg.func,clientSpace,lobbySpace)).start();
+                    break;
             }
         }
     }

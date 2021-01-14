@@ -1,5 +1,6 @@
 public class Message {
     String componentName, func, spaceName;
+    User user;
 
     public Message(String spaceName, String func) {
         this.spaceName = spaceName;
@@ -15,6 +16,11 @@ public class Message {
         this.func = func;
         this.spaceName = spaceName;
 
+    }
+
+    public Message(User user, String func) {
+        this.func = func;
+        this.user = user;
     }
 
 }
