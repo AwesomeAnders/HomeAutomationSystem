@@ -65,7 +65,7 @@ public class ComponentHandler implements Runnable{
 
     public void showAll(){
         try {
-            List<Object[]> list = space.queryAll(new FormalField(Object.class));
+            List<Object[]> list = space.queryAll(new FormalField(String.class), new FormalField(Object.class));
             for (Object[] object : list ) {
                 System.out.println(object[0].toString());
             }
@@ -95,10 +95,10 @@ public class ComponentHandler implements Runnable{
         try {
             if ( space.put(name, component)){
                 System.out.println("added new component: "+ component.toString());
+
             }else{
                 System.out.println("Something went wrong...");
             }
-
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
