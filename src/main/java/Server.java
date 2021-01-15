@@ -45,14 +45,14 @@ public class Server {
                     break;
                 case "add":
                     System.out.println("Message was: " + msg.func);
-                    new Thread(new RoomHandler(msg.spaceName, lobby, rooms, msg.func)).start();
+                    new Thread(new RoomHandler(msg.spaceName, lobby, rooms, msg.func, lobbySpace)).start();
                     break;
                 case "addComp":
                 case "deleteComp":
                 case "updateComp":
                 case "showAll":
                     System.out.println("Message was: " + msg.func);
-                    new Thread(new ComponentHandler(msg.componentName,"off", msg.func, rooms, msg.spaceName)).start();
+                    new Thread(new ComponentHandler(msg.componentName,"off", msg.func, rooms, msg.spaceName,lobbySpace)).start();
                     break;
                 case "showUsers":
                     new Thread(new UserHandler(msg.func,lobbySpace, clientSpace)).start();

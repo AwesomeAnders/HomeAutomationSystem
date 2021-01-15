@@ -8,17 +8,18 @@ import java.util.List;
 public class RoomHandler implements Runnable{
     private Space room;
     private String name;
-    private SpaceRepository lobby;
+    private SpaceRepository spaceRepository;
     private String command;
     private Space rooms;
     private Space lobbySpace;
 
-    public RoomHandler(String name, SpaceRepository lobby, Space rooms, String command) throws InterruptedException {
+    public RoomHandler(String name, SpaceRepository lobby, Space rooms, String command, Space lobbySpace) throws InterruptedException {
         this.name = name;
-        this.lobby = lobby;
+        this.spaceRepository = lobby;
         this.room = new SequentialSpace();
         this.command = command;
         this.rooms = rooms;
+        this.lobbySpace = lobbySpace;
 
     }
 
@@ -56,7 +57,8 @@ public class RoomHandler implements Runnable{
             }else {
                 System.out.println("Creating new room in another thread");
                 rooms.put(name);
-                lobby.add(name,room);
+                spaceRepository.add(name,room);
+                lobbySpace.put("add", "Added new room with name: "+name);
                 System.out.println("Created new room with the name: " + name + " Room size is now: " + rooms.size());
             }
         } catch (InterruptedException e) {

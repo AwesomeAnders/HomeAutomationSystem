@@ -10,13 +10,15 @@ public class ComponentHandler implements Runnable{
     private String command;
     private Space rooms;
     private String spaceName;
+    private Space lobbySpace;
 
-    public ComponentHandler(String name, String status, String command, Space rooms, String spaceName) {
+    public ComponentHandler(String name, String status, String command, Space rooms, String spaceName, Space lobbySpace) {
         this.name = name;
         this.status = status;
         this.command = command;
         this.rooms = rooms;
         this.spaceName = spaceName;
+        this.lobbySpace = lobbySpace;
     }
 
 
@@ -28,8 +30,11 @@ public class ComponentHandler implements Runnable{
             if (theRoom != null){
                 String roomURI = "tcp://127.0.0.1:9001/" + spaceName + "?keep";
                 space = new RemoteSpace(roomURI);
-            }else
+            }else {
                 System.out.println("No room by that name");
+                lobbySpace.put("Error", "No room by that name");
+                return;
+            }
         } catch (InterruptedException | IOException e) {
             e.printStackTrace();
         }
@@ -67,16 +72,22 @@ public class ComponentHandler implements Runnable{
     }
 
     public void updateComponent(){
+
         try {
            Object[] item = space.getp(new ActualField(name), new FormalField(Object.class));
-            space.get(new ActualField("lock"),new ActualField(name));
            if (item != null){
+               space.get(new ActualField("lock"),new ActualField(name));
                Tuple tuple = (Tuple) item[1];
                boolean componentStatus =  Boolean.parseBoolean(tuple.getElementAt(1).toString());
                componentStatus = !componentStatus;
                space.put(name, new Tuple(name, componentStatus));
                space.put("lock",name);
-               System.out.println("Updated component to ["+name+"] "+componentStatus);
+               System.out.println("Updated component to "+name+" "+componentStatus);
+               lobbySpace.put(command,"Updated component to "+name+" "+componentStatus);
+           }
+           else{
+               lobbySpace.put(command,"No component by that name");
+               System.out.println("No component by that name");
            }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -84,14 +95,19 @@ public class ComponentHandler implements Runnable{
     }
 
     private void addComponent(){
+
         Tuple component = new Tuple(name, status);
         try {
+            Object[] item = space.getp(new ActualField(name), new FormalField(Object.class));
+            if (item != null){
+                System.out.println("Component with that name already exists");
+                lobbySpace.put(command, "Component with that name already exists");
+                return;
+            }
             if ( space.put(name, component)){
                 space.put("lock", name);
                 System.out.println("added new component: "+ component.toString());
-
-            }else{
-                System.out.println("Something went wrong...");
+                lobbySpace.put(command, "added new component: "+ name);
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -101,11 +117,13 @@ public class ComponentHandler implements Runnable{
     public void deleteComponent(){
         try {
             Object[] item = space.getp(new ActualField(name), new FormalField(Object.class));
-            space.get(new ActualField("lock"),new ActualField(name));
             if (item != null){
+                space.get(new ActualField("lock"),new ActualField(name));
                 System.out.println("deleted item "+ item[0].toString());
+                lobbySpace.put(command, "deleted component: "+ item[0].toString());
             }else{
-                System.out.println("Something went wrong...");
+                System.out.println("No component with that name");
+                lobbySpace.put(command, "No component with that name");
             }
         } catch (InterruptedException e) {
             e.printStackTrace();

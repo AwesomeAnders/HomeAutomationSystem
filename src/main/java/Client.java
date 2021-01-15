@@ -89,6 +89,7 @@ public class Client {
         String spaceName;
         String componentName;
         String jsonMsg;
+        Object[] response;
 
         while (running) {
             System.out.println("Press 1 to see all rooms");
@@ -109,15 +110,15 @@ public class Client {
                     msg = new Message("list");
                     remoteSpace.put(gson.toJson(msg));
 
-                    //Retrieve response
-                    List response = formatResponse(remoteSpace, "list");
+                    //Retrieve listResponse
+                    List listResponse = formatResponse(remoteSpace, "list");
 
-                    if(response.isEmpty()) {
+                    if(listResponse.isEmpty()) {
                         System.out.println("-- No rooms is available -- ");
                     } else {
-                        System.out.println("-- There is " + response.size() + " room(s) available");
-                        for (int i = 0; i < response.size(); i++) {
-                            System.out.println("-- room " + (i+1) + " named: \"" + response.get(i) + "\" --");
+                        System.out.println("-- There is " + listResponse.size() + " room(s) available");
+                        for (int i = 0; i < listResponse.size(); i++) {
+                            System.out.println("-- room " + (i+1) + " named: \"" + listResponse.get(i) + "\" --");
                         }
                         System.out.println("\n");
                     }
@@ -127,6 +128,9 @@ public class Client {
                     spaceName = scan.next();
                     msg = new Message(spaceName, "add");
                     remoteSpace.put(gson.toJson(msg));
+
+                    getResponse(msg.func, remoteSpace);
+
                     break;
 
                 case 3:
@@ -137,6 +141,8 @@ public class Client {
                     Message addCompMsg = new Message(componentName, "addComp", spaceName);
                     jsonMsg = gson.toJson(addCompMsg);
                     remoteSpace.put(jsonMsg);
+
+                    getResponse(addCompMsg.func, remoteSpace);
                     break;
 
                 case 4:
@@ -144,19 +150,25 @@ public class Client {
                     spaceName = scan.next();
                     System.out.println("Enter name of component");
                     componentName = scan.next();
-                    Message deleteCompMsg = new Message(componentName, "deleteComp", spaceName);
-                    jsonMsg = gson.toJson(deleteCompMsg);
+                    msg = new Message(componentName, "deleteComp", spaceName);
+                    jsonMsg = gson.toJson(msg);
                     remoteSpace.put(jsonMsg);
+
+                    getResponse(msg.func, remoteSpace);
                     break;
+
                 case 5:
                     System.out.println("Enter name of space");
                     spaceName = scan.next();
                     System.out.println("Enter name of component");
                     componentName = scan.next();
-                    Message updateCompMsg = new Message(componentName, "updateComp", spaceName);
-                    jsonMsg = gson.toJson(updateCompMsg);
+                    msg = new Message(componentName, "updateComp", spaceName);
+                    jsonMsg = gson.toJson(msg);
                     remoteSpace.put(jsonMsg);
+
+                    getResponse(msg.func, remoteSpace);
                     break;
+
                 case 6:
                     System.out.println("-- Logged out --");
                     running = false;
@@ -169,5 +181,26 @@ public class Client {
         Gson gson = new Gson();
         Object[] r = remoteSpace.get(new ActualField(msg),new FormalField(Object.class));
         return gson.fromJson(r[1].toString(), List.class);
+    }
+
+    public static void getResponse(String func, RemoteSpace remoteSpace){
+
+        boolean msgReceived = false;
+
+        while (!msgReceived) {
+            Object[] response = new Object[0];
+            try {
+                response = remoteSpace.getp(new ActualField("Error"), new FormalField(String.class));
+                if (response == null)
+                    response = remoteSpace.getp(new ActualField(func), new FormalField(String.class));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (response != null){
+                System.out.println(response[1]);
+                msgReceived = true;
+            }
+        }
     }
 }
