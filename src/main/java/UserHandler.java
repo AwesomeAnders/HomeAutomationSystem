@@ -86,7 +86,7 @@ public class UserHandler implements Runnable{
     private void login() {
         System.out.println("username: " + user.getUserName() + " userId: " + user.getUserID() + " role: " + user.getRole() + " pwd: " + user.getPwd());
         try {
-            Object[] exist = clientSpace.queryp(new ActualField(user.getUserName()),new FormalField(Integer.class), new ActualField(user.getRole()),new ActualField(user.getPwd()));
+            Object[] exist = clientSpace.queryp(new ActualField(user.getUserName()),new FormalField(Integer.class), new FormalField(Enum.class),new ActualField(user.getPwd()));
             if(!user.getRole().equals(User.Role.admin)) {
                 if (exist != null) {
                     lobbySpace.put("loggedInResponse", true);

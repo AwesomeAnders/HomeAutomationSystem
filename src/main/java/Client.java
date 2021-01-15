@@ -119,14 +119,17 @@ public class Client {
                     //Retrieve listResponse
                     List listResponse = formatResponse(remoteSpace, "list");
 
-                    if(listResponse.isEmpty()) {
-                        System.out.println("-- No rooms is available -- ");
-                    } else {
-                        System.out.println("-- There is " + listResponse.size() + " room(s) available");
-                        for (int i = 0; i < listResponse.size(); i++) {
-                            System.out.println("-- room " + (i+1) + " named: \"" + listResponse.get(i) + "\" --");
+
+                    if (listResponse != null) {
+                        if (listResponse.isEmpty()) {
+                            System.out.println("-- No rooms is available -- ");
+                        } else {
+                            System.out.println("-- There is " + listResponse.size() + " room(s) available");
+                            for (int i = 0; i < listResponse.size(); i++) {
+                                System.out.println("-- room " + (i + 1) + " named: \"" + listResponse.get(i) + "\" --");
+                            }
+                            System.out.println("\n");
                         }
-                        System.out.println("\n");
                     }
                     break;
                 case 2:
@@ -236,8 +239,14 @@ public class Client {
 
     private static List formatResponse(RemoteSpace remoteSpace, String msg) throws InterruptedException {
         Gson gson = new Gson();
-        Object[] r = remoteSpace.get(new ActualField(msg),new FormalField(Object.class));
-        return gson.fromJson(r[1].toString(), List.class);
+        Object[] r = remoteSpace.getp(new ActualField(msg),new FormalField(Object.class));
+        if (r == null){
+            Object[] response = remoteSpace.getp(new ActualField("Error"), new FormalField(String.class));
+            if (response != null)
+                System.out.println(response[1]);
+        }else
+            return gson.fromJson(r[1].toString(), List.class);
+        return null;
     }
 
     public static void getResponse(String func, RemoteSpace remoteSpace){
