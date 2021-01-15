@@ -16,6 +16,8 @@ public class Client {
     private static String userName;
     private static String pwd;
 
+    private static User user;
+
     public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("--- Welcome ---");
         loginPromt();
@@ -41,18 +43,22 @@ public class Client {
                     userName = scan.next();
                     System.out.println("Please enter password");
                     pwd = scan.next();
-                    remoteSpace.put(gson.toJson(new Message(new User(userName,pwd),"login")));
+                    user = new User(userName,pwd);
+                    remoteSpace.put(gson.toJson(new Message(user,"login")));
 
                     Object[] loggedInResponse = remoteSpace.get(new ActualField("loggedInResponse"),new FormalField(Boolean.class));
                     System.out.println("-- log-in successful?: "+ loggedInResponse[1]+ " --");
-                    mainPrompt();
+                    if((Boolean) loggedInResponse[1]) {
+                        mainPrompt();
+                    }
                     break;
                 case 2:
                     System.out.println("Please enter a new userName");
                     userName = scan.next();
                     System.out.println("Please enter a new password");
                     pwd = scan.next();
-                    remoteSpace.put(gson.toJson(new Message(new User(userName,pwd),"createUser")));
+                    user = new User(userName,pwd);
+                    remoteSpace.put(gson.toJson(new Message(user,"createUser")));
                     break;
                 case 3:
                     //Sends request
@@ -72,20 +78,21 @@ public class Client {
                     }
                     break;
                 case 4:
-                    remoteSpace.put(gson.toJson(new Message(new User(ADMIN_USERID,ADMIN_PWD),"login")));
+                    user = new User(ADMIN_USERID,ADMIN_PWD);
+                    remoteSpace.put(gson.toJson(new Message(user,"login")));
                     adminPromt();
                     break;
             }
         }
     }
 
-    private static void adminPromt() {
-    }
+
 
     private static void mainPrompt() throws IOException, InterruptedException {
         boolean running = true;
         Scanner scan = new Scanner(System.in);
         Gson gson = new Gson();
+        String role;
         String spaceName;
         String componentName;
         String jsonMsg;
@@ -98,7 +105,7 @@ public class Client {
             System.out.println("Press 4 to delete a component");
             System.out.println("Press 5 to update a component");
             System.out.println("Press 6 to request role");
-            System.out.println("Press 6 to quit");
+            System.out.println("Press 7 to quit");
 
             String scanned = scan.next();
             Message msg;
@@ -132,7 +139,6 @@ public class Client {
                     getResponse(msg.func, remoteSpace);
 
                     break;
-
                 case 3:
                     System.out.println("Enter name of space");
                     spaceName = scan.next();
@@ -170,7 +176,59 @@ public class Client {
                     break;
 
                 case 6:
-                    System.out.println("-- Logged out --");
+                    System.out.println("Choose between current roles:");
+                    System.out.println("-- admin, user --");
+                    role = scan.next();
+                    msg = new Message(user, "requestRole", role);
+
+                    System.out.println("-- awaiting response from admin --");
+                    remoteSpace.put(gson.toJson(msg));
+
+                    Object[] isRoleUpdated = remoteSpace.get(new ActualField("updatedResponse"),new FormalField(Boolean.class));
+                    if((Boolean) isRoleUpdated[1]) {
+                        user.setRole(User.Roles.valueOf(role));
+                        System.out.println("-- Role have been granted and updated --\n");
+                    } else {
+                        System.out.println("-- Role request have been denied --\n");
+                    }
+                    break;
+                case 7:
+                    System.out.println("-- Logged out --\n");
+                    running = false;
+                    break;
+            }
+        }
+    }
+
+    private static void adminPromt() throws IOException {
+        boolean running = true;
+        Scanner scan = new Scanner(System.in);
+        RemoteSpace remoteSpace = new RemoteSpace(REMOTE_URI);
+
+        while (running) {
+            System.out.println("Press 1 to await inbound role change requests");
+            System.out.println("Press 2 to quit admin panel");
+
+            String scanned = scan.next();
+            int choice = Integer.parseInt(scanned);
+            switch (choice) {
+                case 1:
+                    System.out.println("-- Awaiting inbound request --");
+                    try {
+                        Object[] response = remoteSpace.get(new ActualField("roleChange"), new FormalField(User.class), new FormalField(String.class));
+                        System.out.println("-- the user: " + ((User) response[1]).getUserName() + " with role: " + ((User) response[1]).getRole() + " wants to change role to: " + response[2] + " --");
+                        System.out.println("Do you accept (y/n)");
+                        String answer = scan.next().toLowerCase();
+                        if(answer.equals("y") || answer.equals("yes")) {
+                            remoteSpace.put("roleResponse", true);
+                        } else {
+                            remoteSpace.put("roleResponse", false);
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                case 2:
                     running = false;
                     break;
             }

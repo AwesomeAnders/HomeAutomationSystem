@@ -8,9 +8,10 @@ public class User {
 
     public User(String userName, String pwd) {
         this.userName = userName;
-        if(userName == "admin") {
+        if(userName.equals("admin")) {
             this.userID = 1;
             this.role = Roles.admin;
+            this.pwd = pwd;
         } else {
         this.userID = 0;
         this.pwd = pwd;

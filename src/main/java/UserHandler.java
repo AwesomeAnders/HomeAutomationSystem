@@ -12,6 +12,7 @@ public class UserHandler implements Runnable{
     private Space clientSpace;
     private Space lobbySpace;
     private User user;
+    private String newRole;
     private final Gson gson = new Gson();
 
     public UserHandler(String func, Space lobbySpace, Space clientSpace) {
@@ -27,6 +28,14 @@ public class UserHandler implements Runnable{
         this.lobbySpace = lobbySpace;
     }
 
+    public UserHandler(User user, String command, String newRole, Space lobbySpace, Space clientSpace){
+        this.user = user;
+        this.command = command;
+        this.newRole = newRole;
+        this.lobbySpace = lobbySpace;
+        this.clientSpace = clientSpace;
+    }
+
     @Override
     public void run() {
         switch (command) {
@@ -40,9 +49,28 @@ public class UserHandler implements Runnable{
                 login();
                 break;
             case "requestRole":
+                updateRole();
                 break;
-            case "deleteUser":
-                break;
+        }
+    }
+
+    private void updateRole() {
+        System.out.println("username: " + user.getUserName() + " userId: " + user.getUserID() + " role: " + user.getRole() + " new role: " + newRole);
+        try {
+            lobbySpace.put("roleChange", user,newRole);
+
+            Object[] response = lobbySpace.get(new ActualField("roleResponse"), new FormalField(Boolean.class));
+            if((Boolean) response[1]) {
+                Object[] exist = clientSpace.getp(new ActualField(user.getUserName()),new ActualField(user.getUserID()),new ActualField(user.getRole()),new ActualField(user.getPwd()));
+                if(exist[0] != null) {
+                    clientSpace.put(user.getUserName(), user.getUserID(), newRole,user.getPwd());
+                }
+                lobbySpace.put("updatedResponse", true);
+            } else {
+                lobbySpace.put("updatedResponse", false);
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -56,18 +84,19 @@ public class UserHandler implements Runnable{
     }
 
     private void login() {
-        System.out.println("username: " + user.getUserName() + " userId: " + user.getUserID() + " role: " + user.getRole());
+        System.out.println("username: " + user.getUserName() + " userId: " + user.getUserID() + " role: " + user.getRole() + " pwd: " + user.getPwd());
         try {
             Object[] exist = clientSpace.queryp(new ActualField(user.getUserName()),new FormalField(Integer.class), new ActualField(user.getRole()),new ActualField(user.getPwd()));
-            if(exist != null) {
-                lobbySpace.put("loggedInResponse", true);
-            } else {
-                lobbySpace.put("loggedInResponse", false);
+            if(!user.getRole().equals(User.Roles.admin)) {
+                if (exist != null) {
+                    lobbySpace.put("loggedInResponse", true);
+                } else {
+                    lobbySpace.put("loggedInResponse", false);
+                }
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
     }
 
     public void showUsers() {
