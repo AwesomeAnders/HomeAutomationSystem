@@ -114,7 +114,7 @@ public class Client {
             switch (choice) {
                 case 1:
                     //Sends request
-                    msg = new Message("list");
+                    msg = new Message("list", user);
                     remoteSpace.put(gson.toJson(msg));
 
                     //Retrieve listResponse
@@ -133,7 +133,7 @@ public class Client {
                 case 2:
                     System.out.println("Please enter new room name");
                     spaceName = scan.next();
-                    msg = new Message(spaceName, "add");
+                    msg = new Message(spaceName, "add", user);
                     remoteSpace.put(gson.toJson(msg));
 
                     getResponse(msg.func, remoteSpace);
@@ -144,11 +144,11 @@ public class Client {
                     spaceName = scan.next();
                     System.out.println("Enter name of component");
                     componentName = scan.next();
-                    Message addCompMsg = new Message(componentName, "addComp", spaceName);
-                    jsonMsg = gson.toJson(addCompMsg);
+                    msg = new Message(componentName, "addComp", spaceName, user);
+                    jsonMsg = gson.toJson(msg);
                     remoteSpace.put(jsonMsg);
 
-                    getResponse(addCompMsg.func, remoteSpace);
+                    getResponse(msg.func, remoteSpace);
                     break;
 
                 case 4:
@@ -156,7 +156,7 @@ public class Client {
                     spaceName = scan.next();
                     System.out.println("Enter name of component");
                     componentName = scan.next();
-                    msg = new Message(componentName, "deleteComp", spaceName);
+                    msg = new Message(componentName, "deleteComp", spaceName, user);
                     jsonMsg = gson.toJson(msg);
                     remoteSpace.put(jsonMsg);
 
@@ -168,7 +168,7 @@ public class Client {
                     spaceName = scan.next();
                     System.out.println("Enter name of component");
                     componentName = scan.next();
-                    msg = new Message(componentName, "updateComp", spaceName);
+                    msg = new Message(componentName, "updateComp", spaceName, user);
                     jsonMsg = gson.toJson(msg);
                     remoteSpace.put(jsonMsg);
 

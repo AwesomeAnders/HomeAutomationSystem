@@ -1,4 +1,5 @@
 import com.google.gson.Gson;
+import com.sun.xml.internal.ws.api.ha.StickyFeature;
 import org.jspace.*;
 
 import java.util.ArrayList;
@@ -12,27 +13,46 @@ public class RoomHandler implements Runnable{
     private String command;
     private Space rooms;
     private Space lobbySpace;
+    private String userName;
+    private String pwd;
+    private Space clientSpace;
 
-    public RoomHandler(String name, SpaceRepository lobby, Space rooms, String command, Space lobbySpace) throws InterruptedException {
+    public RoomHandler(String name, SpaceRepository lobby, Space rooms, String command, Space lobbySpace, String userName, String pwd, Space clientSpace) throws InterruptedException {
         this.name = name;
         this.spaceRepository = lobby;
         this.room = new SequentialSpace();
         this.command = command;
         this.rooms = rooms;
         this.lobbySpace = lobbySpace;
+        this.userName = userName;
+        this.pwd = pwd;
+        this.clientSpace = clientSpace;
 
     }
 
-    public RoomHandler(Space lobbySpace, Space rooms, String command){
+    public RoomHandler(Space lobbySpace, Space rooms, String command, String userName, String pwd, Space clientSpace) {
         this.lobbySpace = lobbySpace;
-        this.command = command;
         this.rooms = rooms;
+        this.command = command;
+        this.userName = userName;
+        this.pwd = pwd;
+        this.clientSpace = clientSpace;
     }
-
 
 
     @Override
     public void run() {
+
+        if (!validateUser()){
+            try {
+                lobbySpace.put("Error", "You dont have permission");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
+
+
 
         switch (command){
 
@@ -89,8 +109,20 @@ public class RoomHandler implements Runnable{
         }
     }
 
+    public boolean validateUser() {
+        try {
+            Object[] exist = clientSpace.queryp(new ActualField(userName), new FormalField(Integer.class), new FormalField(String.class), new ActualField(pwd));
+            if (exist != null ) {
+                if (exist[2].equals("admin") || exist[2].equals("user"))
+                    return true;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private String formatStr(String str) {
         return str.substring(1,str.length()-1);
     }
-
 }

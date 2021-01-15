@@ -29,4 +29,21 @@ public class Message {
         this.newRole = newRole;
     }
 
+    public Message(String componentName, String func, String spaceName, User user) {
+        this.componentName = componentName;
+        this.func = func;
+        this.spaceName = spaceName;
+        this.user = user;
+    }
+
+    public Message(String list, User user) {
+        this.func = list;
+        this.user = user;
+    }
+
+    public Message(String spaceName, String add, User user) {
+        this.spaceName = spaceName;
+        this.func = add;
+        this.user = user;
+    }
 }

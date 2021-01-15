@@ -11,19 +11,34 @@ public class ComponentHandler implements Runnable{
     private Space rooms;
     private String spaceName;
     private Space lobbySpace;
+    private String userName;
+    private String pwd;
+    private Space clientSpace;
 
-    public ComponentHandler(String name, String status, String command, Space rooms, String spaceName, Space lobbySpace) {
+    public ComponentHandler(String name, String status, String command, Space rooms, String spaceName, Space lobbySpace, String userName, String pwd, Space clientSpace) {
         this.name = name;
         this.status = status;
         this.command = command;
         this.rooms = rooms;
         this.spaceName = spaceName;
         this.lobbySpace = lobbySpace;
+        this.userName = userName;
+        this.pwd = pwd;
+        this.clientSpace = clientSpace;
     }
 
 
     @Override
     public void run() {
+
+        if (!validateUser()){
+            try {
+                lobbySpace.put("Error", "You dont have permission");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return;
+        }
 
         try {
             Object [] theRoom = rooms.queryp(new ActualField(spaceName));
@@ -128,5 +143,18 @@ public class ComponentHandler implements Runnable{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean validateUser() {
+        try{
+            Object[] exist = clientSpace.queryp(new ActualField(userName), new FormalField(Integer.class), new FormalField(String.class), new ActualField(pwd));
+            if (exist != null ) {
+                if (exist[2].equals("admin") || exist[2].equals("user"))
+                    return true;
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

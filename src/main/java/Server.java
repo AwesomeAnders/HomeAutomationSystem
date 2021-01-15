@@ -41,24 +41,25 @@ public class Server {
             switch (msg.func) {
                 case "list":
                     System.out.println("Message was: " + msg.func);
-                    new Thread(new RoomHandler(lobbySpace, rooms, msg.func)).start();
+                    new Thread(new RoomHandler(lobbySpace, rooms, msg.func, msg.user.getUserName(), msg.user.getPwd(), clientSpace)).start();
                     break;
                 case "add":
                     System.out.println("Message was: " + msg.func);
-                    new Thread(new RoomHandler(msg.spaceName, lobby, rooms, msg.func, lobbySpace)).start();
+                    new Thread(new RoomHandler(msg.spaceName, lobby, rooms, msg.func, lobbySpace,msg.user.getUserName(),msg.user.getPwd(), clientSpace)).start();
                     break;
                 case "addComp":
                 case "deleteComp":
                 case "updateComp":
                 case "showAll":
                     System.out.println("Message was: " + msg.func);
-                    new Thread(new ComponentHandler(msg.componentName,"off", msg.func, rooms, msg.spaceName,lobbySpace)).start();
+                    new Thread(new ComponentHandler(msg.componentName,"off", msg.func, rooms, msg.spaceName,lobbySpace, msg.user.getUserName(), msg.user.getPwd(), clientSpace)).start();
                     break;
                 case "showUsers":
                     System.out.println("Message was: " + msg.func);
                     new Thread(new UserHandler(msg.func,lobbySpace, clientSpace)).start();
                     break;
                 case "requestRole":
+                    System.out.println("Message was: " + msg.func);
                     System.out.println("username: " + msg.user.getUserName() + " userId: " + msg.user.getUserID() + " role: " + msg.user.getRole() + " new role: " + msg.newRole);
                     new Thread(new UserHandler(msg.user, msg.func, msg.newRole, lobbySpace, clientSpace)).start();
                     break;
