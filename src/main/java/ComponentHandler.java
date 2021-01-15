@@ -146,10 +146,10 @@ public class ComponentHandler implements Runnable{
     }
 
     public boolean validateUser() {
-        try{
-            Object[] exist = clientSpace.queryp(new ActualField(userName), new FormalField(Integer.class), new FormalField(String.class), new ActualField(pwd));
+        try {
+            Object[] exist = clientSpace.queryp(new ActualField(userName), new FormalField(Integer.class), new FormalField(Enum.class), new ActualField(pwd));
             if (exist != null ) {
-                if (exist[2].equals("admin") || exist[2].equals("user"))
+                if (exist[2].equals(User.Role.admin) || exist[2].equals(User.Role.user))
                     return true;
             }
         } catch (InterruptedException e) {
