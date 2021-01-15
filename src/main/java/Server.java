@@ -57,6 +57,10 @@ public class Server {
                 case "showUsers":
                     new Thread(new UserHandler(msg.func,lobbySpace, clientSpace)).start();
                     break;
+                case "requestRole":
+                    System.out.println("username: " + msg.user.getUserName() + " userId: " + msg.user.getUserID() + " role: " + msg.user.getRole() + " new role: " + msg.newRole);
+                    new Thread(new UserHandler(msg.user, msg.func, msg.newRole, lobbySpace, clientSpace)).start();
+                    break;
                 case "createUser":
                 case "login":
                     new Thread(new UserHandler(msg.user,msg.func,clientSpace,lobbySpace)).start();
