@@ -55,10 +55,12 @@ public class Server {
                     new Thread(new ComponentHandler(msg.componentName,"off", msg.func, rooms, msg.spaceName,lobbySpace)).start();
                     break;
                 case "showUsers":
+                    System.out.println("Message was: " + msg.func);
                     new Thread(new UserHandler(msg.func,lobbySpace, clientSpace)).start();
                     break;
                 case "createUser":
                 case "login":
+                    System.out.println("Message was: " + msg.func);
                     new Thread(new UserHandler(msg.user,msg.func,clientSpace,lobbySpace)).start();
                     break;
             }
