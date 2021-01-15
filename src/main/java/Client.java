@@ -1,5 +1,4 @@
 import com.google.gson.Gson;
-import com.google.gson.JsonSerializer;
 import org.jspace.ActualField;
 import org.jspace.FormalField;
 import org.jspace.RemoteSpace;
@@ -140,7 +139,7 @@ public class Client {
 
                     break;
                 case 3:
-                    System.out.println("Enter name of space");
+                    System.out.println("Enter name of room");
                     spaceName = scan.next();
                     System.out.println("Enter name of component");
                     componentName = scan.next();
@@ -152,7 +151,7 @@ public class Client {
                     break;
 
                 case 4:
-                    System.out.println("Enter name of space");
+                    System.out.println("Enter name of room");
                     spaceName = scan.next();
                     System.out.println("Enter name of component");
                     componentName = scan.next();
@@ -186,7 +185,7 @@ public class Client {
 
                     Object[] isRoleUpdated = remoteSpace.get(new ActualField("updatedResponse"),new FormalField(Boolean.class));
                     if((Boolean) isRoleUpdated[1]) {
-                        user.setRole(User.Roles.valueOf(role));
+                        user.setRole(User.Role.valueOf(role));
                         System.out.println("-- Role have been granted and updated --\n");
                     } else {
                         System.out.println("-- Role request have been denied --\n");
@@ -215,7 +214,7 @@ public class Client {
                 case 1:
                     System.out.println("-- Awaiting inbound request --");
                     try {
-                        Object[] response = remoteSpace.get(new ActualField("roleChange"), new FormalField(User.class), new FormalField(String.class));
+                        Object[] response = remoteSpace.get(new ActualField("roleChange"), new FormalField(User.class), new FormalField(Enum.class));
                         System.out.println("-- the user: " + ((User) response[1]).getUserName() + " with role: " + ((User) response[1]).getRole() + " wants to change role to: " + response[2] + " --");
                         System.out.println("Do you accept (y/n)");
                         String answer = scan.next().toLowerCase();

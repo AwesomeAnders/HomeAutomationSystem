@@ -1,11 +1,6 @@
 import com.google.gson.Gson;
 import org.jspace.*;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class Server {
     //Connection
     public final static String LOCAL_HOST = "tcp://127.0.0.1:9001/?keep";
@@ -61,7 +56,7 @@ public class Server {
                 case "requestRole":
                     System.out.println("Message was: " + msg.func);
                     System.out.println("username: " + msg.user.getUserName() + " userId: " + msg.user.getUserID() + " role: " + msg.user.getRole() + " new role: " + msg.newRole);
-                    new Thread(new UserHandler(msg.user, msg.func, msg.newRole, lobbySpace, clientSpace)).start();
+                    new Thread(new UserHandler(msg.user, msg.func, User.Role.valueOf(msg.newRole), lobbySpace, clientSpace)).start();
                     break;
                 case "createUser":
                 case "login":

@@ -12,7 +12,7 @@ public class UserHandler implements Runnable{
     private Space clientSpace;
     private Space lobbySpace;
     private User user;
-    private String newRole;
+    private User.Role newRole;
     private final Gson gson = new Gson();
 
     public UserHandler(String func, Space lobbySpace, Space clientSpace) {
@@ -28,7 +28,7 @@ public class UserHandler implements Runnable{
         this.lobbySpace = lobbySpace;
     }
 
-    public UserHandler(User user, String command, String newRole, Space lobbySpace, Space clientSpace){
+    public UserHandler(User user, String command, User.Role newRole, Space lobbySpace, Space clientSpace){
         this.user = user;
         this.command = command;
         this.newRole = newRole;
@@ -87,7 +87,7 @@ public class UserHandler implements Runnable{
         System.out.println("username: " + user.getUserName() + " userId: " + user.getUserID() + " role: " + user.getRole() + " pwd: " + user.getPwd());
         try {
             Object[] exist = clientSpace.queryp(new ActualField(user.getUserName()),new FormalField(Integer.class), new ActualField(user.getRole()),new ActualField(user.getPwd()));
-            if(!user.getRole().equals(User.Roles.admin)) {
+            if(!user.getRole().equals(User.Role.admin)) {
                 if (exist != null) {
                     lobbySpace.put("loggedInResponse", true);
                 } else {
