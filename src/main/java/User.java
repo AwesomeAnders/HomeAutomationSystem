@@ -2,20 +2,20 @@ public class User {
     private String userName;
     private int userID;
     private String pwd;
-    private Roles role;
+    private Role role;
 
-    enum Roles{undefined, admin, user}
+    enum Role {undefined, admin, user}
 
     public User(String userName, String pwd) {
         this.userName = userName;
         if(userName.equals("admin")) {
             this.userID = 1;
-            this.role = Roles.admin;
+            this.role = Role.admin;
             this.pwd = pwd;
         } else {
         this.userID = 0;
         this.pwd = pwd;
-        this.role = Roles.undefined;
+        this.role = Role.undefined;
         }
     }
 
@@ -43,11 +43,11 @@ public class User {
         this.pwd = pwd;
     }
 
-    public Roles getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(Roles role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 }
