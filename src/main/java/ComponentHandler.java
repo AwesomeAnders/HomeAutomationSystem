@@ -87,11 +87,12 @@ public class ComponentHandler implements Runnable{
     }
 
     public void updateComponent(){
-
+        Object[] item;
         try {
-           Object[] item = space.getp(new ActualField(name), new FormalField(Object.class));
-           if (item != null){
-               space.get(new ActualField("lock"),new ActualField(name));
+            space.get(new ActualField("lock"),new ActualField(name));
+
+            item = space.get(new ActualField(name), new FormalField(Object.class));
+            if (item != null){
                Tuple tuple = (Tuple) item[1];
                boolean componentStatus =  Boolean.parseBoolean(tuple.getElementAt(1).toString());
                componentStatus = !componentStatus;
@@ -99,18 +100,16 @@ public class ComponentHandler implements Runnable{
                space.put("lock",name);
                System.out.println("Updated component to "+name+" "+componentStatus);
                lobbySpace.put(command,"Updated component to "+name+" "+componentStatus);
-           }
-           else{
+            } else{
                lobbySpace.put(command,"No component by that name");
                System.out.println("No component by that name");
-           }
+            }
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private void addComponent(){
-
+    private void addComponent() {
         Tuple component = new Tuple(name, status);
         try {
             Object[] item = space.getp(new ActualField(name), new FormalField(Object.class));
