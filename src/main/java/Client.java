@@ -102,7 +102,7 @@ public class Client {
             System.out.println("Press 2 to add a new room");
             System.out.println("Press 3 to add a new component");
             System.out.println("Press 4 to delete a component");
-            System.out.println("Press 5 to update a component");
+            System.out.println("Press 5 to turn a component on/off (true/false)");
             System.out.println("Press 6 to request role");
             System.out.println("Press 7 to quit");
 
@@ -166,7 +166,7 @@ public class Client {
                     break;
 
                 case 5:
-                    System.out.println("Enter name of space");
+                    System.out.println("Enter name of room");
                     spaceName = scan.next();
                     System.out.println("Enter name of component");
                     componentName = scan.next();
